@@ -1,5 +1,5 @@
 {
-  description = "CLI tool and seamless kernel module for Arturia MiniFuse 1/2";
+  description = "CLI tool and seamless kernel module for Arturia MiniFuse 1/2/4";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 

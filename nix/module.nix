@@ -10,7 +10,7 @@ let
 in
 {
   options.hardware.minifuse = {
-    enable = lib.mkEnableOption "control tooling for the Arturia MiniFuse 1/2";
+    enable = lib.mkEnableOption "control tooling for the Arturia MiniFuse 1/2/4";
 
     package = lib.mkOption {
       type = lib.types.package;
