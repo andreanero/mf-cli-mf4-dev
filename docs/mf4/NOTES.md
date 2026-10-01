@@ -1,6 +1,6 @@
 # MiniFuse 4 support: working notes
 
-Status as of 2026-09-24. Branch `mf4-dev`, **nothing committed** (the user asked not to commit).
+Status as of 2026-09-24, branch `mf4-dev`.
 
 ## Done
 
@@ -57,9 +57,9 @@ Tested by ear: `4600 -inf`, then `4600 0dB`, with Out 1-2 in USB-direct mode, ga
 
 1. **Output-pair addressing**: how does a mixer command select Out 1-2, Out 3-4 or Loopback? No write carries an output number; the low byte is always a source channel or `00`.
 2. **Next hardware test (pending)**: with audio playing, run `5800 0`, then `4600 -inf`, then `4600 0dB`, then `5800 1`, and report what is heard after each step.
-3. Out 3-4 volume (step 1 of the second capture) could not be clearly isolated. The best candidate is `0x1d00`/`0x2700` at 101 to 105 s. Ask whether 5 to 100 s was exploration.
-4. Input 3 trim sent nothing. Ask whether the trim was actually moved.
-5. Did the user turn USB back on at 294.7 s (`5800 = 1`)?
+3. Out 3-4 volume (step 1 of the second capture) could not be clearly isolated. The best candidate is `0x1d00`/`0x2700` at 101 to 105 s. The 5 to 100 s range may have been exploration.
+4. Input 3 trim sent nothing; unclear whether the trim was actually moved.
+5. Unconfirmed: USB direct turned back on at 294.7 s (`5800 = 1`).
 6. Sleep mode (holding the Arturia button) is probably front-panel only.
 7. Not controllable over USB: gain knobs, Monitor Volume (Out 1-2), headphone knobs. The USB descriptor has no Feature Unit, and `amixer -c M4` shows no controls.
 
@@ -80,27 +80,6 @@ The manuals list nothing more that the app can control (only INST, 48V and meter
 - VirtualBox logs setup, data and status as separate URBs.
 - The 8-byte setup stage is an `S` event on ep 0 with `length == 8` and `flag_setup == 0`, and the setup packet is in the setup field.
 - The payload of an OUT data stage is not in the packet data. Its bytes overwrite the start of the setup field of the following `S` URB, which has `length == wLength`.
-
-### Capture workflow
-
-- VM `win10` (VirtualBox 7.1.18) with xHCI enabled.
-- The auto-attach USB filter for the MiniFuse 4 is **disabled** (`VBoxManage usbfilter modify 0 --target win10 --active no`). While it was active it grabbed the device without capturing, which caused `LIBUSB_ERROR_BUSY`.
-- To capture:
-  ```
-  U=$(VBoxManage list usbhost | awk '/^UUID/{u=$2} /ProductId:.*AF70/{print u}')
-  VBoxManage controlvm win10 usbattach $U --capturefile ~/mf4-xxx.pcap
-  # ...do the actions in Control Center, one every ~5 s...
-  VBoxManage controlvm win10 usbdetach $U
-  ```
-- The UUID changes every time the device re-enumerates. Always look it up with the awk line above, because a looser grep once attached the webcam.
-
-Existing captures (large, safe to delete once decoded):
-
-| File | Size | Contents |
-|---|---|---|
-| `~/mf4.pcap` | 3.2 GB | INST and 48V |
-| `~/mf4-out.pcap` | 541 MB | first mixer session |
-| `~/mf4-out2.pcap` | 1.2 GB | second mixer session; steps 7 and 8 done in swapped order |
 
 ## Build
 
